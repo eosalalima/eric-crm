@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "EricCRM — Sales Dashboard",
-  description: "A clear view of your customers, deals, and sales pipeline.",
+  title: "Funnel Designer — EricCRM",
+  description: "Design, automate, and optimize your sales funnel.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
