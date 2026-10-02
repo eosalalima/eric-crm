@@ -9,7 +9,87 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DATABASE_URL_UNPOOLED")
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  SALES_MANAGER
+  SALES_AGENT
+}
+
+enum AccountStatus {
+  PENDING_APPROVAL
+  ACTIVE
+  REJECTED
+  SUSPENDED
+}
+
+model Organization {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  slug      String
+  createdBy String   @map("created_by") @db.Uuid
+  users     UserProfile[]
+  teams     Team[]
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("workspaces")
+}
+
+model Team {
+  id             String   @id @default(cuid())
+  name           String
+  organizationId String @db.Uuid
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  users          UserProfile[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+}
+
+model UserProfile {
+  id             String        @id @default(cuid())
+  authUserId     String        @unique
+  email          String        @unique
+  firstName      String
+  lastName       String
+  mobile         String?
+  jobTitle       String?
+  role           UserRole      @default(SALES_AGENT)
+  status         AccountStatus @default(PENDING_APPROVAL)
+  organizationId String        @db.Uuid
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  teamId         String?
+  team           Team?         @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  approvedAt     DateTime?
+  approvedById   String?
+  approvedBy     UserProfile?  @relation("Approvals", fields: [approvedById], references: [id], onDelete: SetNull)
+  approvals      UserProfile[] @relation("Approvals")
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  auditActions   AuditLog[]    @relation("AuditActor")
+  auditTargets   AuditLog[]    @relation("AuditTarget")
+
+  @@index([organizationId, status])
+  @@index([teamId])
+  @@index([role])
+}
+
+model AuditLog {
+  id             String       @id @default(cuid())
+  organizationId String       @db.Uuid
+  actorId        String
+  targetUserId   String
+  action         String
+  changes        Json
+  createdAt      DateTime     @default(now())
+  actor          UserProfile  @relation("AuditActor", fields: [actorId], references: [id], onDelete: Restrict)
+  targetUser     UserProfile  @relation("AuditTarget", fields: [targetUserId], references: [id], onDelete: Restrict)
+
+  @@index([organizationId, createdAt])
+  @@index([targetUserId, createdAt])
 }

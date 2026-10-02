@@ -1,0 +1,21 @@
+CREATE TYPE "UserRole" AS ENUM ('ADMIN', 'SALES_MANAGER', 'SALES_AGENT');
+CREATE TYPE "AccountStatus" AS ENUM ('PENDING_APPROVAL', 'ACTIVE', 'REJECTED', 'SUSPENDED');
+
+CREATE TABLE "Team" ("id" TEXT NOT NULL, "name" TEXT NOT NULL, "organizationId" UUID NOT NULL, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL, CONSTRAINT "Team_pkey" PRIMARY KEY ("id"));
+CREATE TABLE "UserProfile" ("id" TEXT NOT NULL, "authUserId" TEXT NOT NULL, "email" TEXT NOT NULL, "firstName" TEXT NOT NULL, "lastName" TEXT NOT NULL, "mobile" TEXT, "jobTitle" TEXT, "role" "UserRole" NOT NULL DEFAULT 'SALES_AGENT', "status" "AccountStatus" NOT NULL DEFAULT 'PENDING_APPROVAL', "organizationId" UUID NOT NULL, "teamId" TEXT, "approvedAt" TIMESTAMP(3), "approvedById" TEXT, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL, CONSTRAINT "UserProfile_pkey" PRIMARY KEY ("id"));
+CREATE TABLE "AuditLog" ("id" TEXT NOT NULL, "organizationId" UUID NOT NULL, "actorId" TEXT NOT NULL, "targetUserId" TEXT NOT NULL, "action" TEXT NOT NULL, "changes" JSONB NOT NULL, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, CONSTRAINT "AuditLog_pkey" PRIMARY KEY ("id"));
+CREATE UNIQUE INDEX "Team_organizationId_name_key" ON "Team"("organizationId", "name");
+CREATE INDEX "Team_organizationId_idx" ON "Team"("organizationId");
+CREATE UNIQUE INDEX "UserProfile_authUserId_key" ON "UserProfile"("authUserId");
+CREATE UNIQUE INDEX "UserProfile_email_key" ON "UserProfile"("email");
+CREATE INDEX "UserProfile_organizationId_status_idx" ON "UserProfile"("organizationId", "status");
+CREATE INDEX "UserProfile_teamId_idx" ON "UserProfile"("teamId");
+CREATE INDEX "UserProfile_role_idx" ON "UserProfile"("role");
+CREATE INDEX "AuditLog_organizationId_createdAt_idx" ON "AuditLog"("organizationId", "createdAt");
+CREATE INDEX "AuditLog_targetUserId_createdAt_idx" ON "AuditLog"("targetUserId", "createdAt");
+ALTER TABLE "Team" ADD CONSTRAINT "Team_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "workspaces"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "UserProfile" ADD CONSTRAINT "UserProfile_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "workspaces"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "UserProfile" ADD CONSTRAINT "UserProfile_teamId_fkey" FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "UserProfile" ADD CONSTRAINT "UserProfile_approvedById_fkey" FOREIGN KEY ("approvedById") REFERENCES "UserProfile"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "AuditLog" ADD CONSTRAINT "AuditLog_actorId_fkey" FOREIGN KEY ("actorId") REFERENCES "UserProfile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "AuditLog" ADD CONSTRAINT "AuditLog_targetUserId_fkey" FOREIGN KEY ("targetUserId") REFERENCES "UserProfile"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

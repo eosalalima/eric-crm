@@ -1,0 +1,2 @@
+import { AuthCard } from "@/components/auth-card"; import { SignOutButton } from "@/components/sign-out";
+export default function PendingPage(){return <AuthCard title="Approval pending" subtitle="Your email is verified and your account is awaiting review."><div className="status-illustration">⌛</div><p className="center-copy">An EricCRM administrator will assign your role and team. You’ll be able to access the workspace after approval.</p><SignOutButton/></AuthCard>}
