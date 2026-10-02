@@ -1,0 +1,2 @@
+import Link from "next/link"; import { AuthCard } from "@/components/auth-card";
+export default function RegistrationSuccess(){return <AuthCard title="Check your inbox" subtitle="Your account was created successfully."><div className="success-panel"><span>✓</span><h2>Verify your email</h2><p>Use the link Neon Auth sent to your email. After verification, an administrator must approve your account before you can access CRM data.</p></div><Link className="primary-action link-button" href="/login">Continue to sign in</Link></AuthCard>}
