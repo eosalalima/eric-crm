@@ -4,13 +4,19 @@ export type AuthUser = { id: string; email: string; name?: string; emailVerified
 export type AuthSession = { user: AuthUser; session: { id: string; expiresAt: string } };
 
 function baseUrl() {
-  const value = process.env.NEON_AUTH_BASE_URL;
-  if (!value) throw new Error("NEON_AUTH_BASE_URL is required");
-  return value.replace(/\/$/, "");
+  return process.env.NEON_AUTH_BASE_URL?.trim().replace(/\/$/, "") || null;
 }
 
 export async function neonAuthRequest(path: string, init: RequestInit = {}) {
-  return fetch(`${baseUrl()}/api/auth/${path.replace(/^\//, "")}`, { ...init, cache: "no-store" });
+  const url = baseUrl();
+  if (!url) {
+    return Response.json(
+      { error: "Authentication service is not configured." },
+      { status: 503 },
+    );
+  }
+
+  return fetch(`${url}/api/auth/${path.replace(/^\//, "")}`, { ...init, cache: "no-store" });
 }
 
 export async function getAuthSession(): Promise<AuthSession | null> {
