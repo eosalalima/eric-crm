@@ -4,7 +4,7 @@ EricCRM is a Next.js 16 CRM backed by Neon PostgreSQL, Prisma 7, and Neon Auth. 
 
 ## Local setup
 
-1. Create or select a Neon project and run `npm install`.
+1. Create or select a Neon project and run `npm ci` to install the exact dependency versions from `package-lock.json`. If dependencies were already installed before pulling an update, run `npm install` again before starting the app.
 2. Copy `.env.example` to `.env.local`. Set the pooled and direct Neon connection strings. Set `CRM_ORGANIZATION_ID` to the UUID of the single existing row in `workspaces` that this deployment serves.
 3. In **Neon Console → Auth**, enable Email & Password, require email verification, and configure your production-capable email provider. Neon Auth—not EricCRM—stores passwords and issues sessions, verification links, and reset tokens.
 4. Add allowed application origins (`http://localhost:3000` locally and the deployed HTTPS origin) and callback URLs:
