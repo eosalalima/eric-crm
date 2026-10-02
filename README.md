@@ -15,6 +15,8 @@ EricCRM is a Next.js 16 CRM backed by Neon PostgreSQL, Prisma 7, and Neon Auth. 
 6. Apply existing migrations without resetting data: `npx prisma migrate deploy`. Generate the client with `npx prisma generate`.
 7. Start with `npm run dev` and register at `/register`.
 
+If `NEON_AUTH_BASE_URL` is absent, protected pages redirect to the sign-in screen and auth API requests return `503 Authentication service is not configured` instead of crashing server rendering. Set the variable to the Auth endpoint from the Neon Console and restart the Next.js server to enable authentication.
+
 Do not use a development/no-op email sender in production. If verification or reset messages do not arrive, review the Neon Auth email-provider logs; the app intentionally never reports that an account exists on the forgot-password screen.
 
 ## Initial administrator (explicit bootstrap)
