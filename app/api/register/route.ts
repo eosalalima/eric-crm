@@ -1,5 +1,6 @@
 import { neonAuthRequest } from "@/lib/neon-auth";
 import { prisma } from "@/lib/prisma";
+import { authErrorMessage } from "@/lib/auth-error";
 
 export async function POST(request: Request) {
     const input = await request.json();
