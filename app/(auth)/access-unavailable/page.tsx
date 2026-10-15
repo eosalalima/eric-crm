@@ -1,2 +1,16 @@
-import { AuthCard } from "@/components/auth-card"; import { SignOutButton } from "@/components/sign-out";
-export default function Unavailable(){return <AuthCard title="Access unavailable" subtitle="This account is rejected or suspended."><p className="center-copy">Contact your EricCRM administrator if you believe this is an error. No CRM data is available for this account.</p><SignOutButton/></AuthCard>}
+import { AuthCard } from "@/components/auth-card";
+import { SignOutButton } from "@/components/sign-out";
+export default function Unavailable() {
+    return (
+        <AuthCard
+            title="Access unavailable"
+            subtitle="This account is rejected or suspended."
+        >
+            <p className="center-copy">
+                Contact your EricCRM administrator if you believe this is an
+                error. No CRM data is available for this account.
+            </p>
+            <SignOutButton />
+        </AuthCard>
+    );
+}
